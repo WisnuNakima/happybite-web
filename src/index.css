@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar {
+    display: none;
+  }
+  html {
+    @apply scroll-smooth motion-reduce:scroll-auto;
+  }
+  body {
+    @apply m-0 min-w-80 bg-cream font-sans text-chocolate antialiased;
+  }
+  button,
+  a,
+  input,
+  summary {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-baked focus-visible:ring-offset-4;
+  }
+  ::selection {
+    @apply bg-primary/40 text-chocolate;
+  }
+}
