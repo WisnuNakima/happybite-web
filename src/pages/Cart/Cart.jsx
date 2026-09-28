@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import Icon from '../components/Icon'
-import SiteDialog from '../components/SiteDialog'
-import CartItemCard from '../components/CartItemCard'
-import CartGiftMessage from '../components/CartGiftMessage'
-import { detailProducts } from '../data/catalogProducts'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import Icon from '@/components/Icon'
+import SiteDialog from '@/components/SiteDialog'
+import CartItemCard from '@/pages/Cart/components/CartItemCard'
+import CartGiftMessage from '@/pages/Cart/components/CartGiftMessage'
+import { detailProducts } from '@/data/catalogProducts'
 
 const rupiah = (amount) => `Rp ${amount.toLocaleString('id-ID')}`
 

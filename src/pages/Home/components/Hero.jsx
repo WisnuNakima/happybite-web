@@ -1,6 +1,7 @@
 import Button from './Button'
-import Icon from './Icon'
-import { MotionItem, Stagger } from './Animation'
+import Icon from '@/components/Icon'
+import MotionItem from './MotionItem'
+import Stagger from './Stagger'
 
 export default function Hero({ onAccount }) {
   return (
@@ -31,11 +32,7 @@ export default function Hero({ onAccount }) {
             </Button>
           </MotionItem>
         </div>
-        <MotionItem
-          as="div"
-          fromRight
-          className="mx-auto w-full max-w-xl"
-        >
+        <MotionItem as="div" fromRight className="mx-auto w-full max-w-xl">
           <img
             src="/images/hero-cookies.jpg"
             alt="Cookie cokelat artisan yang baru dipanggang"

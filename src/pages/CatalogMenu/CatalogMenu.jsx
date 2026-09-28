@@ -1,16 +1,16 @@
 import { useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import Icon from '../components/Icon'
-import SiteDialog from '../components/SiteDialog'
-import CatalogProductCard from '../components/CatalogProductCard'
-import CatalogVariantDialog from '../components/CatalogVariantDialog'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import Icon from '@/components/Icon'
+import SiteDialog from '@/components/SiteDialog'
+import CatalogProductCard from '@/pages/CatalogMenu/components/CatalogProductCard'
+import CatalogVariantDialog from '@/pages/CatalogMenu/components/CatalogVariantDialog'
 import {
   catalogCategories,
   catalogProducts,
   moreCatalogProducts,
-} from '../data/catalogProducts'
+} from '@/data/catalogProducts'
 
 const allProducts = [...catalogProducts, ...moreCatalogProducts]
 

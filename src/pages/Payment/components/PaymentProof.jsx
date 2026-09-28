@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import Icon from './Icon'
+import Icon from '@/components/Icon'
 
 export default function PaymentProof({ file, onFile, disabled }) {
   const input = useRef(null)

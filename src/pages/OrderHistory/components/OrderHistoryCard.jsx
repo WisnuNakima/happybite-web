@@ -1,6 +1,6 @@
-import Icon from './Icon'
+import Icon from '@/components/Icon'
 import OrderTracking from './OrderTracking'
-import { formatOrderDate, formatRupiah } from '../data/orderHistory'
+import { formatOrderDate, formatRupiah } from '@/data/orderHistory'
 
 export default function OrderHistoryCard({
   order,

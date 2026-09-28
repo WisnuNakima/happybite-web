@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import Icon from './Icon'
-import { products } from '../data/products'
+import { products } from '@/data/products'
 
 const faqs = [
   [

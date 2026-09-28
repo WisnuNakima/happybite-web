@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import SiteDialog from '../components/SiteDialog'
-import Icon from '../components/Icon'
-import CheckoutSteps from '../components/CheckoutSteps'
-import CheckoutField from '../components/CheckoutField'
-import { detailProducts } from '../data/catalogProducts'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import SiteDialog from '@/components/SiteDialog'
+import Icon from '@/components/Icon'
+import CheckoutSteps from '@/components/StepProgress'
+import CheckoutField from '@/pages/Checkout/components/CheckoutField'
+import { detailProducts } from '@/data/catalogProducts'
 
 const rupiah = (amount) => `Rp ${amount.toLocaleString('id-ID')}`
 const regions = [

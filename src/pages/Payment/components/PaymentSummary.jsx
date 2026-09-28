@@ -1,4 +1,4 @@
-import Icon from './Icon'
+import Icon from '@/components/Icon'
 
 const rupiah = (value) => `Rp ${value.toLocaleString('id-ID')}`
 

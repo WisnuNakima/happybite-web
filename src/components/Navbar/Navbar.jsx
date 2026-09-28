@@ -1,10 +1,11 @@
+import NavigationLink from './NavigationLink'
 import { useEffect, useRef, useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
-import Brand from './Brand'
-import Icon from './Icon'
+import { Link } from 'react-router-dom'
+import Brand from '@/components/Brand'
+import Icon from '@/components/Icon'
 import ProfileDropdown from './ProfileDropdown'
 import NotificationButton from './NotificationButton'
-import { useAuth } from '../context/authContext'
+import { useAuth } from '@/context/authContext'
 
 const guestLinks = [
   ['Beranda', '/'],
@@ -20,40 +21,6 @@ const memberLinks = [
   ['Tentang Kami', '/#tentang'],
   ['Kontak & FAQ', '/#kontak'],
 ]
-
-function NavigationLink({
-  label,
-  to,
-  mobile = false,
-  locked = false,
-  onClick,
-}) {
-  const className = mobile
-    ? 'block rounded-xl px-4 py-3 text-sm font-semibold transition hover:bg-blush'
-    : 'rounded-full px-3 py-3 text-xs font-semibold transition hover:bg-blush xl:px-4'
-  return to.includes('#') ? (
-    <Link to={to} onClick={onClick} className={`${className} text-muted`}>
-      {locked && (
-        <Icon name="lock" className="mr-1 inline-block h-3 w-3 align-middle" />
-      )}
-      {label}
-    </Link>
-  ) : (
-    <NavLink
-      to={to}
-      end={to === '/'}
-      onClick={onClick}
-      className={({ isActive }) =>
-        `${className} ${isActive ? 'bg-blush text-chocolate' : 'text-muted'}`
-      }
-    >
-      {locked && (
-        <Icon name="lock" className="mr-1 inline-block h-3 w-3 align-middle" />
-      )}
-      {label}
-    </NavLink>
-  )
-}
 
 export default function Navbar({ onAccount, onSearch, cartCount = 0 }) {
   const { isLoggedIn } = useAuth()

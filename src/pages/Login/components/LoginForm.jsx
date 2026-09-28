@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import Icon from './Icon'
+import Icon from '@/components/Icon'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/authContext'
+import { useAuth } from '@/context/authContext'
 
 export default function LoginForm({ onRegister }) {
   const { login } = useAuth()

@@ -1,6 +1,6 @@
 import Button from './Button'
-import Icon from './Icon'
-import { Reveal } from './Animation'
+import Icon from '@/components/Icon'
+import { Reveal } from '@/components/Animation'
 
 export default function CatalogGateBanner({ onAccount }) {
   return (

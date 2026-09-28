@@ -5,8 +5,8 @@ import {
   NOTIFICATIONS_KEY,
   orderNotification,
   readNotifications,
-} from '../data/notifications'
-import { ORDERS_KEY, readStoredOrders } from '../data/orders'
+} from '@/data/notifications'
+import { ORDERS_KEY, readStoredOrders } from '@/data/orders'
 
 function initialNotifications() {
   const notifications = readNotifications()

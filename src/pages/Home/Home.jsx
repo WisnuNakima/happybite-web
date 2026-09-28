@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Hero from '../components/Hero'
-import AboutSection from '../components/AboutSection'
-import GalleryShowcase from '../components/GalleryShowcase'
-import HowItWorksSteps from '../components/HowItWorksSteps'
-import Testimonials from '../components/Testimonials'
-import Footer from '../components/Footer'
-import SiteDialog from '../components/SiteDialog'
+import Navbar from '@/components/Navbar'
+import Hero from '@/pages/Home/components/Hero'
+import AboutSection from '@/pages/Home/components/AboutSection'
+import GalleryShowcase from '@/pages/Home/components/GalleryShowcase'
+import HowItWorksSteps from '@/pages/Home/components/HowItWorksSteps'
+import Testimonials from '@/pages/Home/components/Testimonials'
+import Footer from '@/components/Footer'
+import SiteDialog from '@/components/SiteDialog'
 
 export default function Home({ cartCount }) {
   const [dialog, setDialog] = useState(null)

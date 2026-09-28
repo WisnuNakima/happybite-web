@@ -19,33 +19,57 @@ npm run preview
 
 ## Project structure
 
-- `src/pages/Home.jsx` assembles the homepage and owns the active dialog state.
-- `src/pages/Login.jsx` renders the `/login` page and accessible login/register tabs.
-- `src/pages/CatalogMenu.jsx` renders `/katalog` with search, category filters, wishlist toggles, and load more.
-- `src/pages/ProductDetail.jsx` renders `/katalog/:productId` using the same mock data, shared navbar, footer, and cart count. Product images and names link here from catalog and pairing cards.
-- `src/components/ProductGallery.jsx` owns thumbnail selection, wishlist state, and an accessible zoom dialog. `RelatedProductCard.jsx` renders pairing suggestions.
-- `src/pages/Checkout.jsx` renders `/checkout` with the shared navbar/footer, checkout steps, controlled shipping form, and a summary derived from selected shared cart items.
-- `src/components/CheckoutField.jsx` and `CheckoutSteps.jsx` provide reusable checkout fields and progress navigation.
-- `src/pages/Payment.jsx` renders `/pembayaran` with a persistent deadline, copy/download actions, local payment-proof selection, and a recipient/order summary. `PaymentProof.jsx` and `PaymentSummary.jsx` keep these sections reusable.
-- Successful confirmation opens `/riwayat-pesanan`; the legacy `/pesanan-berhasil` URL redirects there too.
-- `src/context/AuthProvider.jsx` wraps the app with shared demo authentication; `authContext.js` exports `useAuth`. `ProfileDropdown.jsx` exposes profile, order history, and logout.
-- `src/context/NotificationsProvider.jsx` owns account-scoped notifications and read status under `localStorage['happybite-notifications-v1']`. `NotificationButton.jsx` opens `NotificationPanel.jsx` as a centered modal overlay, without changing routes.
-- `src/pages/AccountPlaceholder.jsx` renders the `/profil` placeholder using the shared navbar/footer.
-- `src/pages/OrderHistory.jsx` renders the protected `/riwayat-pesanan` page. `OrderHistoryCard.jsx`, `OrderTracking.jsx`, and `OrderHistoryDialog.jsx` provide reusable cards, delivery stages, details, and local note editing.
-- `src/context/OrdersProvider.jsx` owns shared, account-scoped orders persisted in `localStorage['happybite-orders-v1']`. `src/data/orders.js` creates checkout snapshots and initializes two labeled examples from `orderHistory.js`. `src/utils/orderPdf.js` generates downloadable demo receipts locally.
-- `src/data/shopSession.js` restores tab-session cart/checkout/order state and centralizes payment totals and order consistency checks.
-- `src/pages/Cart.jsx` renders `/keranjang`, with reusable `CartItemCard` and `CartGiftMessage` components.
-- `src/data/cart.js` defines the shared cart reducer for product/variant lines, quantities, selection, and removal.
-- `src/components/CatalogProductCard.jsx` and `CatalogVariantDialog.jsx` render reusable product cards and bundle selections.
-- `src/components/LoginForm.jsx` owns login input state, validation, and password visibility.
-- `src/components/RegisterForm.jsx` owns independent registration input state, validation, password visibility, and remember-me state.
-- `src/App.jsx` defines storefront, auth, checkout, payment, and account routes; owns shared cart, greeting, checkout, and order state; and handles route titles and scroll positions.
-- `src/components/` contains each requested section plus shared buttons, icons, headings, cards, and dialogs.
-- `GalleryShowcase` includes `CatalogGateBanner`.
-- `src/data/products.js` holds product names, descriptions, tags, and image paths.
-- `src/data/catalogProducts.js` holds eight initial catalog products and four additional mock products, with category counts computed from all twelve.
-- `tailwind.config.js` defines all requested brand colors, the font, and card shadows.
-- `src/index.css` contains Tailwind directives and minimal Tailwind base defaults. All component styling uses utility classes.
+Each page directory contains its page component and an index.js re-export. Components used only by that page live in its components/ directory. Cross-folder imports use @/, configured in both vite.config.js and jsconfig.json.
+
+```text
+src/
+  pages/
+    Home/                Home.jsx, index.js, components/
+    Login/               Login.jsx, index.js, components/
+    CatalogMenu/         CatalogMenu.jsx, index.js, components/
+    ProductDetail/       ProductDetail.jsx, index.js, components/
+    Cart/                Cart.jsx, index.js, components/
+    Checkout/            Checkout.jsx, index.js, components/
+    Payment/             Payment.jsx, index.js, components/
+    OrderHistory/        OrderHistory.jsx, index.js, components/, utils/orderPdf.js
+    AccountPlaceholder/  AccountPlaceholder.jsx, index.js
+  components/
+    Navbar/              Navbar, NavigationLink, ProfileDropdown, NotificationButton, NotificationPanel
+    Footer/              Footer
+    StepProgress/        CheckoutSteps
+    Animation/           Reveal, shared animation presets
+    Brand.jsx
+    Icon.jsx
+    SiteDialog.jsx
+  context/               Auth, Orders, Notifications providers and hooks
+  data/                  Catalog, cart reducer, session helpers, orders, notifications
+  assets/                Custom assets
+  routes/AppRoutes.jsx
+  App.jsx
+  main.jsx
+  index.css
+```
+
+Page ownership is based on actual imports, including nested components:
+
+| Page | Local components |
+| --- | --- |
+| Home | Hero, AboutSection, GalleryShowcase, ProductCard, CatalogGateBanner, HowItWorksSteps, StepCard, Testimonials, TestimonialCard, Button, SectionHeading, Stagger, MotionItem |
+| Login | LoginForm, RegisterForm |
+| CatalogMenu | CatalogProductCard, CatalogVariantDialog |
+| ProductDetail | ProductDetailContent, ProductGallery, ImageZoom, RelatedProductCard |
+| Cart | CartItemCard, CartGiftMessage |
+| Checkout | CheckoutField |
+| Payment | PaymentProof, PaymentSummary |
+| OrderHistory | OrderHistoryCard, OrderHistoryDialog, OrderTracking |
+
+The catalog, Home gallery, and pairing cards are distinct components with distinct markup; no shared ProductCard was introduced. Reveal is shared through Home and Footer, while Stagger and MotionItem are Home-only. Navbar's subcomponents are shared through Navbar itself. Components previously removed from the design remain absent.
+
+src/routes/AppRoutes.jsx contains every existing Route and redirect. App.jsx retains the cart, greeting, checkout, and payment-session state, handlers, page titles, and scroll behavior. Existing auth/checkout guards remain inside their page components. No new cart context, guard, or reset button was added.
+
+Auth and notifications persist per the existing providers; cart/session logic remains in src/data/cart.js and src/data/shopSession.js. Product and order fixtures remain in src/data/. The unused Vite template react.svg and vite.svg were removed; custom assets and public image URLs remain unchanged.
+
+All moved tracked files used git mv. Each React component has its own file; JSX, styling, and component logic were preserved during extraction.
 
 ## Replace the photos
 
@@ -85,7 +109,7 @@ The Home, Login, and Catalog pages run without an authentication or commerce bac
 
 ## Animation
 
-`src/components/Animation.jsx` centralizes the Motion (`motion/react`) presets.
+`src/components/Animation/presets.js` centralizes the Motion (`motion/react`) presets, shared by Reveal and the Home animation components.
 Sections reveal at 20% visibility with a 24px rise and a 0.55s ease-out, reset
 when leaving the viewport, and replay on every re-entry in either scroll direction.
 Card grids stagger by 0.12s; the hero uses the same viewport-triggered sequence with
@@ -122,6 +146,8 @@ Order history browser checks cover authentication redirects, navbar/dropdown acc
 Connected-order browser checks cover Cart → Checkout → guest sign-in → QRIS confirmation → history, exact recipient/item/greeting/total snapshots, persistence across reload and a new browser session, account isolation, storage failures without cart loss, repeated-confirmation deduplication, partial checkout and variants, date/search/status filtering, and persisted note edits.
 
 Notification browser checks cover guest/member navbar differences, catalog lock icons, checkout-generated alerts and deduplication, dynamic badges/category counts, mark-all and individual read persistence, account isolation, modal focus and dismissal, order-history links, and scrollable layouts at 320–1536 pixels. Legacy unsupported-category fixtures verify that old entries no longer appear or affect unread counts.
+
+The folder refactor additionally verifies unchanged ASTs for all 72 existing functions, constants, Route JSX, App state, and CSS; resolves every import; checks shared/page-only component ownership; and exercises all existing routes, checkout, and notifications in the browser.
 
 ## Hosting
 

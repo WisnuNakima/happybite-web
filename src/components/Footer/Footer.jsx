@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
-import Brand from './Brand'
-import Icon from './Icon'
-import { Reveal } from './Animation'
+import Brand from '@/components/Brand'
+import Icon from '@/components/Icon'
+import { Reveal } from '@/components/Animation'
 
 const favorites = [
   'Classic Chocochip',

@@ -1,4 +1,4 @@
-import Icon from './Icon'
+import Icon from '@/components/Icon'
 
 const stages = [
   ['warm', 'Oven Dapur'],

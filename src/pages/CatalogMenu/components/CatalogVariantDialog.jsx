@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import Icon from './Icon'
+import Icon from '@/components/Icon'
 
 export default function CatalogVariantDialog({ product, onClose, onAdd }) {
   const dialog = useRef(null)

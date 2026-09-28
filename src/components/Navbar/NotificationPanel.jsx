@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { useNotifications } from '../context/notificationsContext'
-import { relativeTime } from '../data/notifications'
-import Icon from './Icon'
+import { useNotifications } from '@/context/notificationsContext'
+import { relativeTime } from '@/data/notifications'
+import Icon from '@/components/Icon'
 
 const filters = [
   ['all', 'Semua'],

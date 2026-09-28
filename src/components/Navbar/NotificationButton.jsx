@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { useNotifications } from '../context/notificationsContext'
-import Icon from './Icon'
+import { useNotifications } from '@/context/notificationsContext'
+import Icon from '@/components/Icon'
 import NotificationPanel from './NotificationPanel'
 
 export default function NotificationButton() {

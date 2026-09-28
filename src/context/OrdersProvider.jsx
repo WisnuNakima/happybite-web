@@ -2,11 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useAuth } from './authContext'
 import { OrdersContext } from './ordersContext'
 import { useNotifications } from './notificationsContext'
-import {
-  ORDERS_KEY,
-  createSampleOrders,
-  readStoredOrders,
-} from '../data/orders'
+import { ORDERS_KEY, createSampleOrders, readStoredOrders } from '@/data/orders'
 
 function initialOrders() {
   try {

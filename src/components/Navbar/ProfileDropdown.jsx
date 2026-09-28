@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/authContext'
-import Icon from './Icon'
+import { useAuth } from '@/context/authContext'
+import Icon from '@/components/Icon'
 
 export default function ProfileDropdown() {
   const { user, logout } = useAuth()

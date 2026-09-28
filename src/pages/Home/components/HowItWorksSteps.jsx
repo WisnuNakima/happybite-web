@@ -1,6 +1,7 @@
-import Icon from './Icon'
+import StepCard from './StepCard'
 import SectionHeading from './SectionHeading'
-import { MotionItem, Reveal, Stagger } from './Animation'
+import { Reveal } from '@/components/Animation'
+import Stagger from './Stagger'
 
 const steps = [
   {
@@ -28,21 +29,6 @@ const steps = [
       'Cookie dipanggang fresh, dikemas aman, dan langsung dikirim ke pintu rumahmu.',
   },
 ]
-
-export function StepCard({ number, title, icon, description }) {
-  return (
-    <MotionItem className="rounded-[30px] bg-peach p-6">
-      <div className="mb-4 flex items-center justify-between">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-baked text-sm font-bold text-white">
-          {number}
-        </span>
-        <Icon name={icon} className="h-6 w-6 text-baked" />
-      </div>
-      <h3 className="text-lg font-semibold leading-6">{title}</h3>
-      <p className="mt-3 text-sm leading-5 text-muted">{description}</p>
-    </MotionItem>
-  )
-}
 
 export default function HowItWorksSteps() {
   return (

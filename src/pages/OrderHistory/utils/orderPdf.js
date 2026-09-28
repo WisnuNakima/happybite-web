@@ -1,4 +1,4 @@
-import { formatOrderDate, formatRupiah } from '../data/orderHistory'
+import { formatOrderDate, formatRupiah } from '@/data/orderHistory'
 
 // Small text-only sample receipt; no payment verification or backend is implied.
 export function downloadOrderPdf(order) {

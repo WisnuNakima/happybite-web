@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import SiteDialog from '../components/SiteDialog'
-import Icon from '../components/Icon'
-import CheckoutSteps from '../components/CheckoutSteps'
-import PaymentProof from '../components/PaymentProof'
-import PaymentSummary from '../components/PaymentSummary'
-import { selectedOrderItems, orderTotals } from '../data/shopSession'
-import { useAuth } from '../context/authContext'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import SiteDialog from '@/components/SiteDialog'
+import Icon from '@/components/Icon'
+import CheckoutSteps from '@/components/StepProgress'
+import PaymentProof from '@/pages/Payment/components/PaymentProof'
+import PaymentSummary from '@/pages/Payment/components/PaymentSummary'
+import { selectedOrderItems, orderTotals } from '@/data/shopSession'
+import { useAuth } from '@/context/authContext'
 
 export default function Payment({
   cartCount,

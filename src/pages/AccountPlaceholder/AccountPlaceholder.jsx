@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/authContext'
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
-import SiteDialog from '../components/SiteDialog'
+import { useAuth } from '@/context/authContext'
+import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import SiteDialog from '@/components/SiteDialog'
 
 export default function AccountPlaceholder({ kind, cartCount }) {
   const { isLoggedIn, user } = useAuth()

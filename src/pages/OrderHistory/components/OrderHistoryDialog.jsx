@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import Icon from './Icon'
-import { formatOrderDate, formatRupiah } from '../data/orderHistory'
+import Icon from '@/components/Icon'
+import { formatOrderDate, formatRupiah } from '@/data/orderHistory'
 
 export default function OrderHistoryDialog({ order, mode, onClose, onSave }) {
   const dialog = useRef(null)

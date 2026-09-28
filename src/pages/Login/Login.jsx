@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import Brand from '../components/Brand'
-import Icon from '../components/Icon'
-import LoginForm from '../components/LoginForm'
-import RegisterForm from '../components/RegisterForm'
-import SiteDialog from '../components/SiteDialog'
+import Brand from '@/components/Brand'
+import Icon from '@/components/Icon'
+import LoginForm from '@/pages/Login/components/LoginForm'
+import RegisterForm from '@/pages/Login/components/RegisterForm'
+import SiteDialog from '@/components/SiteDialog'
 
 const tabs = [
   { id: 'login', label: 'Masuk (Login)' },

@@ -1,23 +1,15 @@
+import AppRoutes from '@/routes/AppRoutes'
 import { useEffect, useReducer, useState } from 'react'
-import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
-import Home from './pages/Home'
-import Login from './pages/Login'
-import CatalogMenu from './pages/CatalogMenu'
-import ProductDetail from './pages/ProductDetail'
-import Checkout from './pages/Checkout'
-import Cart from './pages/Cart'
-import Payment from './pages/Payment'
-import AccountPlaceholder from './pages/AccountPlaceholder'
-import OrderHistory from './pages/OrderHistory'
-import { useOrders } from './context/ordersContext'
-import { createCheckoutOrder } from './data/orders'
+import { useLocation } from 'react-router-dom'
+import { useOrders } from '@/context/ordersContext'
+import { createCheckoutOrder } from '@/data/orders'
 import {
   SESSION_KEY,
   readShopSession,
   orderFingerprint,
-} from './data/shopSession'
-import { cartReducer } from './data/cart'
-import { detailProducts } from './data/catalogProducts'
+} from '@/data/shopSession'
+import { cartReducer } from '@/data/cart'
+import { detailProducts } from '@/data/catalogProducts'
 
 export default function App() {
   const { addOrder } = useOrders()
@@ -111,74 +103,20 @@ export default function App() {
   }, [pathname, hash, key])
 
   return (
-    <Routes>
-      <Route path="/" element={<Home cartCount={cartCount} />} />
-      <Route path="/login" element={<Login />} />
-      <Route
-        path="/profil"
-        element={<AccountPlaceholder kind="profile" cartCount={cartCount} />}
-      />
-      <Route
-        path="/riwayat-pesanan"
-        element={<OrderHistory cartCount={cartCount} />}
-      />
-      <Route
-        path="/katalog"
-        element={<CatalogMenu cartCount={cartCount} onAddToCart={addToCart} />}
-      />
-      <Route
-        path="/katalog/:productId"
-        element={
-          <ProductDetail
-            cartCount={cartCount}
-            onAddToCart={addToCart}
-            onBuyNow={buyNow}
-          />
-        }
-      />
-      <Route
-        path="/checkout"
-        element={
-          <Checkout
-            cartItems={cartItems}
-            cartCount={cartCount}
-            gift={gift}
-            form={checkout}
-            setForm={setCheckout}
-            onContinue={startPayment}
-          />
-        }
-      />
-      <Route
-        path="/pembayaran"
-        element={
-          <Payment
-            key={order?.id}
-            cartCount={cartCount}
-            cartItems={cartItems}
-            checkout={checkout}
-            order={order?.status === 'placed' ? order : currentOrder}
-            onConfirm={confirmPayment}
-          />
-        }
-      />
-      <Route
-        path="/pesanan-berhasil"
-        element={<Navigate to="/riwayat-pesanan" replace />}
-      />
-      <Route
-        path="/keranjang"
-        element={
-          <Cart
-            cartItems={cartItems}
-            cartCount={cartCount}
-            dispatchCart={dispatchCart}
-            gift={gift}
-            onGiftChange={setGift}
-          />
-        }
-      />
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <AppRoutes
+      cartCount={cartCount}
+      cartItems={cartItems}
+      dispatchCart={dispatchCart}
+      gift={gift}
+      setGift={setGift}
+      checkout={checkout}
+      setCheckout={setCheckout}
+      order={order}
+      currentOrder={currentOrder}
+      addToCart={addToCart}
+      buyNow={buyNow}
+      startPayment={startPayment}
+      confirmPayment={confirmPayment}
+    />
   )
 }

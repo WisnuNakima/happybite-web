@@ -1,4 +1,4 @@
-import { Reveal } from './Animation'
+import { Reveal } from '@/components/Animation'
 
 export default function AboutSection() {
   return (
