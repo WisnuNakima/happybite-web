@@ -4,6 +4,7 @@ export const catalogCategories = [
   { id: 'stuffed', label: 'Stuffed Soft Cookies' },
   { id: 'bundles', label: 'Box & Hampers Hemat' },
   { id: 'vegan', label: 'Gluten-Free & Vegan' },
+  { id: 'seasonal', label: 'Seasonal Special' },
 ]
 
 // The eight products shown in the approved catalog. Prices and stock are mock data.
@@ -268,3 +269,37 @@ export const detailProducts = [
   ...moreCatalogProducts,
   coffeePairing,
 ]
+
+export const productCategories = [
+  { id: 'stuffed', label: 'Stuffed Lava' },
+  { id: 'signature', label: 'Signature NYC' },
+  { id: 'bundles', label: 'Hampers & Gift Box' },
+  { id: 'seasonal', label: 'Seasonal Special' },
+  { id: 'vegan', label: 'Gluten-Free & Vegan' },
+  { id: 'drinks', label: 'Minuman' },
+]
+
+// One seed catalog for admin, storefront, cart, and checkout. Existing categories
+// and the pairing-only drink are retained rather than relabeling customer data.
+export const seedProducts = detailProducts.map((product, index) => ({
+  ...product,
+  sku: `HB-${
+    product.id === 'red-velvet'
+      ? 'RV'
+      : product.id
+          .split('-')
+          .map((part) => part[0])
+          .join('')
+          .toUpperCase()
+  }-${String(index + 1).padStart(2, '0')}`,
+  stokDisplayEtalase: Number(product.stockNote?.match(/\d+/)?.[0] || 8),
+  adonanDinginChiller:
+    product.category === 'drinks' ? 0 : index === 0 ? 60 : 40,
+  adonanDinginLokasi:
+    index === 0 ? '3 Loyang di Chiller B' : '2 Loyang di Chiller A',
+  suhuOvenIdeal: product.category === 'drinks' ? '' : '175°C',
+  durasiPemanggangan: product.category === 'drinks' ? '' : '12 Menit',
+  isLiveOnWebsite: true,
+  isCatalogVisible: product.category !== 'drinks',
+  deskripsiProduk: product.fullDescription,
+}))

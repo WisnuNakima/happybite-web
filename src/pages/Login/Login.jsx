@@ -118,6 +118,15 @@ export default function Login() {
           >
             <RegisterForm onLogin={() => switchTab('login', true)} />
           </div>
+          <p className="mt-5 text-center text-xs text-muted">
+            Mengelola dapur HappyBite?{' '}
+            <Link
+              to="/admin/login"
+              className="font-semibold text-terracotta hover:text-baked"
+            >
+              Masuk sebagai admin
+            </Link>
+          </p>
         </section>
       </main>
 

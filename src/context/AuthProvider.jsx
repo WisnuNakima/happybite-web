@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AuthContext } from './authContext'
+import { MOCK_ADMIN_CREDENTIALS } from '@/data/adminAuth'
 
 const AUTH_KEY = 'happybite-auth-v1'
 function readUser() {
@@ -12,7 +13,14 @@ function readUser() {
       typeof saved.user?.email === 'string' &&
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(saved.user.email)
     )
-      return { name: saved.user.name, email: saved.user.email }
+      return {
+        name: saved.user.name,
+        email: saved.user.email,
+        role: saved.user.role === 'admin' ? 'admin' : 'customer',
+        ...(saved.user.role === 'admin' && {
+          jobTitle: saved.user.jobTitle || 'Head Baker & Owner',
+        }),
+      }
   } catch {
     /* An unavailable or invalid storage entry starts logged out. */
   }
@@ -21,9 +29,8 @@ function readUser() {
 
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(readUser)
-  function login({ name, email }) {
+  function saveUser(nextUser) {
     // School-project sign-in only. Never retain or persist a password.
-    const nextUser = { name: name.trim(), email: email.trim() }
     setUser(nextUser)
     try {
       localStorage.setItem(
@@ -33,6 +40,25 @@ export default function AuthProvider({ children }) {
     } catch {
       /* In-memory sign-in still works without storage. */
     }
+  }
+  function login({ name, email }) {
+    // Customer login/register must never grant an admin role, even for the admin email.
+    saveUser({ name: name.trim(), email: email.trim(), role: 'customer' })
+  }
+  function loginAdmin({ email, password }) {
+    // Temporary mock only; real credential verification belongs on the backend.
+    if (
+      email.trim().toLowerCase() !== MOCK_ADMIN_CREDENTIALS.email ||
+      password !== MOCK_ADMIN_CREDENTIALS.password
+    )
+      return false
+    saveUser({
+      name: 'Dhea Ardiansyah',
+      jobTitle: 'Head Baker & Owner',
+      email: MOCK_ADMIN_CREDENTIALS.email,
+      role: 'admin',
+    })
+    return true
   }
   function logout() {
     setUser(null)
@@ -44,7 +70,7 @@ export default function AuthProvider({ children }) {
   }
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn: user !== null, user, login, logout }}
+      value={{ isLoggedIn: user !== null, user, login, loginAdmin, logout }}
     >
       {children}
     </AuthContext.Provider>

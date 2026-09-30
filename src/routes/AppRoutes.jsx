@@ -8,6 +8,13 @@ import Cart from '@/pages/Cart'
 import Payment from '@/pages/Payment'
 import AccountPlaceholder from '@/pages/AccountPlaceholder'
 import OrderHistory from '@/pages/OrderHistory'
+import AdminLogin from '@/pages/admin/AdminLogin'
+import Dashboard from '@/pages/admin/Dashboard'
+import ManajemenProduk from '@/pages/admin/ManajemenProduk'
+import KelolaPesanan from '@/pages/admin/KelolaPesanan'
+import LaporanPenjualan from '@/pages/admin/LaporanPenjualan'
+import AdminRoute from '@/pages/admin/components/AdminRoute'
+import AdminLayout from '@/pages/admin/components/AdminLayout'
 
 export default function AppRoutes({
   cartCount,
@@ -26,6 +33,15 @@ export default function AppRoutes({
 }) {
   return (
     <Routes>
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route element={<AdminRoute />}>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="produk" element={<ManajemenProduk />} />
+          <Route path="pesanan" element={<KelolaPesanan />} />
+          <Route path="laporan" element={<LaporanPenjualan />} />
+        </Route>
+      </Route>
       <Route path="/" element={<Home cartCount={cartCount} />} />
       <Route path="/login" element={<Login />} />
       <Route

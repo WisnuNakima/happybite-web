@@ -8,6 +8,7 @@ import CheckoutSteps from '@/components/StepProgress'
 import PaymentProof from '@/pages/Payment/components/PaymentProof'
 import PaymentSummary from '@/pages/Payment/components/PaymentSummary'
 import { selectedOrderItems, orderTotals } from '@/data/shopSession'
+import { useProducts } from '@/context/productsContext'
 import { useAuth } from '@/context/authContext'
 
 export default function Payment({
@@ -17,6 +18,7 @@ export default function Payment({
   order,
   onConfirm,
 }) {
+  const { products } = useProducts()
   const navigate = useNavigate()
   const { isLoggedIn } = useAuth()
   const [confirmationError, setConfirmationError] = useState('')
@@ -26,8 +28,8 @@ export default function Payment({
   const [now, setNow] = useState(Date.now)
   const [copyMessage, setCopyMessage] = useState('')
   const openAccount = () => navigate('/login')
-  const items = selectedOrderItems(cartItems)
-  const totals = orderTotals(cartItems)
+  const items = selectedOrderItems(cartItems, products)
+  const totals = orderTotals(cartItems, products)
   const seconds = Math.max(0, Math.ceil(((order?.deadline || 0) - now) / 1000))
   const expired = seconds === 0
   const timer = `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`

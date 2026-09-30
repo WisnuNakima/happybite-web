@@ -1,4 +1,4 @@
-import { detailProducts } from './catalogProducts'
+import { seedProducts } from './catalogProducts'
 
 export const SESSION_KEY = 'happybite-shop-v1'
 export const emptyCheckout = {
@@ -17,7 +17,7 @@ const emptySession = () => ({
   order: null,
 })
 
-export function readShopSession() {
+export function readShopSession(detailProducts = seedProducts) {
   try {
     const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY))
     if (!saved || !Array.isArray(saved.cartItems)) return emptySession()
@@ -56,7 +56,7 @@ export function readShopSession() {
   }
 }
 
-export function selectedOrderItems(cartItems) {
+export function selectedOrderItems(cartItems, detailProducts = seedProducts) {
   return cartItems
     .filter((item) => item.selected)
     .map((item) => ({
@@ -66,20 +66,27 @@ export function selectedOrderItems(cartItems) {
     .filter((item) => item.product)
 }
 
-export function orderFingerprint(cartItems, checkout, gift) {
+export function orderFingerprint(
+  cartItems,
+  checkout,
+  gift,
+  detailProducts = seedProducts,
+) {
   return JSON.stringify({
-    items: selectedOrderItems(cartItems).map(({ product, ...item }) => ({
-      ...item,
-      price: product.price,
-    })),
+    items: selectedOrderItems(cartItems, detailProducts).map(
+      ({ product, ...item }) => ({
+        ...item,
+        price: product.price,
+      }),
+    ),
     checkout,
     gift,
   })
 }
 
 // No shipping or gateway charge is configured in this local checkout.
-export function orderTotals(cartItems) {
-  const subtotal = selectedOrderItems(cartItems).reduce(
+export function orderTotals(cartItems, detailProducts = seedProducts) {
+  const subtotal = selectedOrderItems(cartItems, detailProducts).reduce(
     (sum, item) => sum + item.quantity * item.product.price,
     0,
   )

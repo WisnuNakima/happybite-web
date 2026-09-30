@@ -6,15 +6,14 @@ import Icon from '@/components/Icon'
 import SiteDialog from '@/components/SiteDialog'
 import CatalogProductCard from '@/pages/CatalogMenu/components/CatalogProductCard'
 import CatalogVariantDialog from '@/pages/CatalogMenu/components/CatalogVariantDialog'
-import {
-  catalogCategories,
-  catalogProducts,
-  moreCatalogProducts,
-} from '@/data/catalogProducts'
-
-const allProducts = [...catalogProducts, ...moreCatalogProducts]
+import { catalogCategories } from '@/data/catalogProducts'
+import { useProducts } from '@/context/productsContext'
 
 export default function CatalogMenu({ cartCount, onAddToCart }) {
+  const { products } = useProducts()
+  const allProducts = products.filter(
+    (p) => p.isLiveOnWebsite && p.isCatalogVisible,
+  )
   const [query, setQuery] = useState('')
   const [category, setCategory] = useState('all')
   const [visibleCount, setVisibleCount] = useState(8)

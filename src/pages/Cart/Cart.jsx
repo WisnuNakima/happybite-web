@@ -6,7 +6,7 @@ import Icon from '@/components/Icon'
 import SiteDialog from '@/components/SiteDialog'
 import CartItemCard from '@/pages/Cart/components/CartItemCard'
 import CartGiftMessage from '@/pages/Cart/components/CartGiftMessage'
-import { detailProducts } from '@/data/catalogProducts'
+import { useProducts } from '@/context/productsContext'
 
 const rupiah = (amount) => `Rp ${amount.toLocaleString('id-ID')}`
 
@@ -17,6 +17,7 @@ export default function Cart({
   gift,
   onGiftChange,
 }) {
+  const { products: detailProducts } = useProducts()
   const navigate = useNavigate()
   const [dialog, setDialog] = useState(null)
   const selectAll = useRef(null)

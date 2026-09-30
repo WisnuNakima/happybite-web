@@ -6,7 +6,7 @@ import SiteDialog from '@/components/SiteDialog'
 import Icon from '@/components/Icon'
 import CheckoutSteps from '@/components/StepProgress'
 import CheckoutField from '@/pages/Checkout/components/CheckoutField'
-import { detailProducts } from '@/data/catalogProducts'
+import { useProducts } from '@/context/productsContext'
 
 const rupiah = (amount) => `Rp ${amount.toLocaleString('id-ID')}`
 const regions = [
@@ -29,6 +29,7 @@ export default function Checkout({
   setForm,
   onContinue,
 }) {
+  const { products: detailProducts } = useProducts()
   const navigate = useNavigate()
   const [dialog, setDialog] = useState(null)
   const [errors, setErrors] = useState({})

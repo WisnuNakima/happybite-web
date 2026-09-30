@@ -61,13 +61,20 @@ export function createSampleOrders(now = Date.now()) {
   }))
 }
 
-export function createCheckoutOrder({ id, cartItems, checkout, gift, sender }) {
+export function createCheckoutOrder({
+  id,
+  cartItems,
+  checkout,
+  gift,
+  sender,
+  products,
+}) {
   return {
     id,
     source: 'checkout',
     timestamp: new Date().toISOString(),
     status: 'processing',
-    items: selectedOrderItems(cartItems).map(
+    items: selectedOrderItems(cartItems, products).map(
       ({ id: lineId, product, quantity, variant }) => ({
         id: lineId,
         productId: product.id,
@@ -86,7 +93,7 @@ export function createCheckoutOrder({ id, cartItems, checkout, gift, sender }) {
       .filter(Boolean)
       .join(', '),
     courierNote: checkout.notes,
-    ...orderTotals(cartItems),
+    ...orderTotals(cartItems, products),
     paymentMethod: 'QRIS',
     paymentStatus: 'Menunggu verifikasi',
     sender: sender.trim(),

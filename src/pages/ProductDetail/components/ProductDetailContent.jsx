@@ -6,7 +6,8 @@ import Icon from '@/components/Icon'
 import SiteDialog from '@/components/SiteDialog'
 import ProductGallery from '@/pages/ProductDetail/components/ProductGallery'
 import RelatedProductCard from '@/pages/ProductDetail/components/RelatedProductCard'
-import { catalogCategories, detailProducts } from '@/data/catalogProducts'
+import { catalogCategories } from '@/data/catalogProducts'
+import { useProducts } from '@/context/productsContext'
 
 const rupiah = (value) => `Rp ${value.toLocaleString('id-ID')}`
 export default function ProductDetailContent({
@@ -15,6 +16,7 @@ export default function ProductDetailContent({
   onAddToCart,
   onBuyNow,
 }) {
+  const { products: detailProducts } = useProducts()
   const navigate = useNavigate()
   const [quantity, setQuantity] = useState(1)
   const [variant, setVariant] = useState(product?.variants?.[0] || '')
@@ -26,7 +28,9 @@ export default function ProductDetailContent({
     'Minuman Teman Cookie'
   const related =
     product?.relatedProductIds
-      .map((id) => detailProducts.find((item) => item.id === id))
+      .map((id) =>
+        detailProducts.find((item) => item.id === id && item.isLiveOnWebsite),
+      )
       .filter(Boolean) || []
 
   function addProduct(item, count = 1) {
