@@ -1,3 +1,5 @@
+import { fulfillmentLabels, fulfillmentOf } from './orderFulfillment'
+
 export const NOTIFICATIONS_KEY = 'happybite-notifications-v1'
 
 export function readNotifications() {
@@ -32,6 +34,8 @@ export function readNotifications() {
 }
 
 export function orderNotification(order) {
+  const kitchenStage = fulfillmentOf(order)
+  const kitchenUpdate = ['baking', 'packing'].includes(kitchenStage)
   const labels = {
     processing: 'Sedang Diproses',
     shipping: 'Sedang Dikirim',
@@ -39,12 +43,13 @@ export function orderNotification(order) {
     cancelled: 'Dibatalkan',
   }
   return {
-    id: `order:${order.id}:${order.status}`,
+    id: `order:${order.id}:${kitchenUpdate ? kitchenStage : order.status}`,
     ownerEmail: order.ownerEmail,
     type: 'status',
-    title: `Pesanan #${order.id} ${labels[order.status] || 'Diperbarui'}`,
-    description:
-      order.status === 'processing'
+    title: `Pesanan #${order.id} ${kitchenUpdate ? fulfillmentLabels[kitchenStage] : labels[order.status] || 'Diperbarui'}`,
+    description: kitchenUpdate
+      ? `Pesananmu kini ${fulfillmentLabels[kitchenStage].toLowerCase()} di dapur HappyBite.`
+      : order.status === 'processing'
         ? 'Pesananmu sudah tercatat dan masuk antrean dapur HappyBite. Konfirmasi pembayaran menunggu verifikasi.'
         : 'Status pesananmu telah diperbarui. Lihat rincian pesanan untuk informasi selengkapnya.',
     timestamp: order.updatedAt || order.timestamp,

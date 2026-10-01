@@ -1,4 +1,4 @@
-import { Outlet, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { useAuth } from '@/context/authContext'
 import Icon from '@/components/Icon'
@@ -9,6 +9,7 @@ export default function AdminLayout() {
   const { user } = useAuth()
   const [query, setQuery] = useState('')
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   return (
     <div className="group/admin min-h-dvh bg-canvas text-chocolate md:flex">
       <AdminSidebar />
@@ -18,10 +19,15 @@ export default function AdminLayout() {
             HappyBite
           </span>
           <form
-            className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-muted/40 bg-peach px-3 sm:max-w-sm"
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-muted/40 bg-peach px-3 focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/15 sm:max-w-sm"
             onSubmit={(event) => {
               event.preventDefault()
-              navigate(`/admin/produk?q=${encodeURIComponent(query)}`)
+              const destination = ['/admin/pesanan', '/admin/laporan'].includes(
+                pathname,
+              )
+                ? pathname
+                : '/admin/produk'
+              navigate(`${destination}?q=${encodeURIComponent(query)}`)
             }}
           >
             <Icon name="search" className="h-4 w-4 text-muted" />
@@ -30,7 +36,7 @@ export default function AdminLayout() {
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               placeholder="Cari pesanan, cookies, atau pelanggan..."
-              className="min-w-0 flex-1 bg-transparent py-2 text-xs outline-none focus-visible:ring-0"
+              className="min-w-0 flex-1 bg-transparent py-2 text-xs outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </form>
           <div className="ml-auto flex items-center gap-3">

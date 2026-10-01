@@ -1,6 +1,7 @@
 import Icon from '@/components/Icon'
 import OrderTracking from './OrderTracking'
 import { formatOrderDate, formatRupiah } from '@/data/orderHistory'
+import { fulfillmentLabels, fulfillmentOf } from '@/data/orderFulfillment'
 
 export default function OrderHistoryCard({
   order,
@@ -36,13 +37,20 @@ export default function OrderHistoryCard({
         </div>
         {order.status === 'processing' && (
           <span className="rounded-full bg-blush/70 px-3 py-1.5 text-[10px] font-bold text-baked">
-            Diproses Dapur
+            {order.source === 'checkout'
+              ? fulfillmentLabels[fulfillmentOf(order)]
+              : 'Diproses Dapur'}
           </span>
         )}
         {completed && (
           <span className="inline-flex items-center gap-1 rounded-full bg-blush/70 px-3 py-1.5 text-[10px] font-bold text-baked">
             <Icon name="seal" className="h-3.5 w-3.5" />
             Selesai Diterima • {formatOrderDate(order.deliveredAt)}
+          </span>
+        )}
+        {order.source === 'checkout' && order.status === 'shipping' && (
+          <span className="rounded-full bg-blush/70 px-3 py-1.5 text-[10px] font-bold text-baked">
+            Sedang Dikirim
           </span>
         )}
       </header>

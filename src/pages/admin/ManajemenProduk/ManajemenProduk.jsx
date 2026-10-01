@@ -106,7 +106,7 @@ export default function ManajemenProduk() {
           ))}
         </div>
         <div className="flex flex-wrap justify-between gap-4">
-          <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-muted/50 bg-peach px-3 sm:max-w-lg">
+          <label className="flex min-w-0 flex-1 items-center gap-2 rounded-full border border-muted/50 bg-peach px-3 focus-within:border-terracotta focus-within:ring-2 focus-within:ring-terracotta/15 sm:max-w-lg">
             <Icon name="search" className="h-4 w-4 text-muted" />
             <input
               aria-label="Cari produk atau SKU"
@@ -118,7 +118,7 @@ export default function ManajemenProduk() {
                 setPage(1)
               }}
               placeholder="Cari varian cookie atau SKU (e.g. HB-RV-01)..."
-              className="min-w-0 flex-1 bg-transparent py-2.5 text-xs outline-none focus-visible:ring-0"
+              className="min-w-0 flex-1 bg-transparent py-2.5 text-xs outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
           </label>
           <select

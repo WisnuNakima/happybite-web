@@ -35,12 +35,12 @@ const assert = require('node:assert/strict');
     const nav = page.getByRole('navigation', { name: 'Navigasi admin', exact: true });
     await nav.getByRole('link', { name: heading, exact: true }).click();
     await page.waitForURL(base + route);
-    await page.getByRole('heading', { name: heading, exact: true }).waitFor();
-    if (route !== '/admin/produk') assert.equal(await page.locator('main').innerText(), heading);
+    await page.getByRole('heading', { name: route === '/admin/pesanan' ? 'Kelola Pesanan & Distribusi Pengiriman' : route === '/admin/laporan' ? 'Laporan Penjualan & Analisis Finansial' : heading, exact: true }).waitFor();
+    if (!['/admin/produk', '/admin/pesanan', '/admin/laporan'].includes(route)) assert.equal(await page.locator('main').innerText(), heading);
     assert.equal(await nav.getByRole('link', { name: heading, exact: true }).getAttribute('aria-current'), 'page');
     assert.equal(await nav.locator('[aria-current="page"]').count(), 1);
     assert.ok(await page.evaluate(() => window.sidebarBefore === document.querySelector('aside')));
-    assert.equal(await page.locator('footer').count(), route === '/admin/produk' ? 1 : 0);
+    assert.equal(await page.locator('footer').count(), ['/admin/produk', '/admin/pesanan', '/admin/laporan'].includes(route) ? 1 : 0);
     assert.equal(await page.getByRole('navigation', { name: 'Navigasi utama', exact: true }).count(), 0);
   }
   const previousUrl = page.url();
@@ -48,9 +48,9 @@ const assert = require('node:assert/strict');
   assert.equal(page.url(), previousUrl);
   for (const [route, heading] of routes) {
     await page.goto(base + route);
-    await page.getByRole('heading', { name: heading, exact: true }).waitFor();
+    await page.getByRole('heading', { name: route === '/admin/pesanan' ? 'Kelola Pesanan & Distribusi Pengiriman' : route === '/admin/laporan' ? 'Laporan Penjualan & Analisis Finansial' : heading, exact: true }).waitFor();
     await page.reload();
-    await page.getByRole('heading', { name: heading, exact: true }).waitFor();
+    await page.getByRole('heading', { name: route === '/admin/pesanan' ? 'Kelola Pesanan & Distribusi Pengiriman' : route === '/admin/laporan' ? 'Laporan Penjualan & Analisis Finansial' : heading, exact: true }).waitFor();
     assert.equal((await auth()).user.role, 'admin');
   }
   for (const width of [320, 375, 768, 1280]) {

@@ -119,9 +119,9 @@ src/pages/admin/
     AdminRoute/        AdminRoute.jsx, index.js
   AdminLogin/          AdminLogin.jsx, index.js, components/AdminLoginForm.jsx
   Dashboard/           Dashboard.jsx, index.js, components/.gitkeep
-  ManajemenProduk/     ManajemenProduk.jsx, index.js, components/.gitkeep
-  KelolaPesanan/       KelolaPesanan.jsx, index.js, components/.gitkeep
-  LaporanPenjualan/    LaporanPenjualan.jsx, index.js, components/.gitkeep
+  ManajemenProduk/     ManajemenProduk.jsx, index.js, components/, utils/
+  KelolaPesanan/       KelolaPesanan.jsx, index.js, components/, utils/
+  LaporanPenjualan/    LaporanPenjualan.jsx, index.js, components/, utils/
 ```
 
 - `/admin/login` is public and outside AdminLayout. The minimal form uses `loginAdmin()` with the single temporary `MOCK_ADMIN_CREDENTIALS` constant in `src/data/adminAuth.js`: `admin@happybite.com` / `admin123`.
@@ -132,13 +132,33 @@ src/pages/admin/
 
 ## Admin product management
 
-`/admin/produk` uses the shared admin shell and a non-modal right-hand editor. Search by name/SKU, category/stock filters, page sizes, pagination, row selection, duplicate-as-draft, deletion confirmation, and PDF export (current filtered list) work locally. Other admin pages remain placeholders.
+`/admin/produk` uses the shared admin shell and a non-modal right-hand editor. Search by name/SKU, category/stock filters, page sizes, pagination, row selection, duplicate-as-draft, deletion confirmation, and PDF export (current filtered list) work locally. Dashboard remains a placeholder.
 
 - `src/data/catalogProducts.js` holds the original catalog/detail fixtures and extended `seedProducts`. Existing vegan products and the pairing-only drink retain their categories; counts are derived from the actual data.
 - `ProductsProvider` owns the shared product list, persisted as `happybite-products-v1` in localStorage and synchronized between browser tabs. Catalog, detail, cart, checkout, payment, and new order snapshots use this same list. Previously placed orders keep their snapshots.
 - The editor supports name/price validation, stock and chiller information, oven settings, description, website visibility, and local JPG/PNG/WEBP photos up to 2 MB. Photos are stored as data URLs; storage failures keep the editor open with an error and do not claim a successful save. Hiding a product removes it from the catalog, related products, and public detail lookup.
-- Mock admin profile now includes `jobTitle`. The top search opens product search; order/customer searches can be connected when those admin pages are implemented.
+- Mock admin profile now includes `jobTitle`. The top search searches orders/customers on `/admin/pesanan`, transactions on `/admin/laporan`, and products elsewhere.
 - Run `node .artifacts/admin-products-check.cjs` with Vite on `127.0.0.1:5185` and the existing local Playwright harness to check CRUD, filters, uploads, persistence, cross-tab updates, PDF export, responsive layout, and a new product through the full checkout/order flow.
+
+## Admin order management
+
+`/admin/pesanan` reads the existing OrdersContext. Admins see orders from all customer accounts stored in this browser, alongside the two clearly marked existing demo orders. Customer history and notifications remain scoped to the signed-in account; there is no backend or cross-device synchronization yet.
+
+- `fulfillmentStatus` tracks `pending → baking → packing → shipping → completed`, independently of payment status. Older orders are normalized on read. `deliveryMethod` defaults to `Belum ditentukan` until supplied; no courier assignment or GPS data is fabricated.
+- Status transitions persist to localStorage, update customer history, and generate customer-owned notifications. Completing an order sets its delivery timestamp. Repeated clicks with a stale status cannot skip a stage, and failed writes do not update the UI state.
+- The table supports combined order/customer search, status/delivery/payment filters, five-row pagination, and CSV export of all filtered rows. Customer-entered CSV cells are quoted and protected against spreadsheet formula interpretation.
+- Row selection opens an inline, docked detail panel showing the actual recipient/address/notes, items and totals. The table total and panel summary omit payment-method tags. Copy and browser print work; the panel remains usable after a status change moves a row out of the active filter.
+- `.artifacts/admin-orders-check.cjs` verifies a real checkout through all admin status transitions, customer-history and notification synchronization, account visibility, persistence, copy/print/export, filters/pagination, storage failure and desktop/tablet layout.
+
+## Admin sales reports
+
+`/admin/laporan` derives all metrics from OrdersContext entries with `source: 'checkout'`; demo orders are excluded even when no real orders exist. Default dates span all existing checkout orders and expand when new orders arrive, unless the admin chooses a custom period.
+
+- Dates are inclusive in Asia/Jakarta (WIB). Revenue is the sum of every order total in the period, including pending/cancelled orders as specified; this is order value, not verified funds received. AOV is rounded to whole rupiah for display; zero orders produce Rp 0. Best sellers aggregate item quantities by product identity, using order snapshots.
+- The SVG chart has daily, Monday-based weekly, and calendar-month grouping, keyboard/hover callouts, and empty states. Normal periods include days without sales; periods longer than a year show occupied buckets only, explicitly labeled, to bound rendering without dropping any revenue. No fabricated comparison series is displayed.
+- Transaction search and payment-status filters affect the paginated table and its export, while summary cards/chart and header exports follow the date range. Cancelled orders take precedence over paid/pending status in the table filter.
+- PDF export generates a paginated text report. Export Excel downloads a UTF-8 CSV compatible with Excel (not an XLSX workbook); table CSV includes every matching row, not only the visible page. CSV values are escaped and spreadsheet formulas neutralized. Print uses the browser dialog.
+- `.artifacts/sales-report-check.cjs` checks actual checkout updates, demo exclusion, empty/invalid ranges, WIB boundaries, quantities/AOV, daily/weekly/monthly totals, table filters/pagination, all exports/printing and responsive widths.
 
 ## Animation
 

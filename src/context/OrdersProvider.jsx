@@ -3,6 +3,11 @@ import { useAuth } from './authContext'
 import { OrdersContext } from './ordersContext'
 import { useNotifications } from './notificationsContext'
 import { ORDERS_KEY, createSampleOrders, readStoredOrders } from '@/data/orders'
+import {
+  fulfillmentOf,
+  nextFulfillment,
+  orderKey,
+} from '@/data/orderFulfillment'
 
 function initialOrders() {
   try {
@@ -31,8 +36,14 @@ export default function OrdersProvider({ children }) {
 
   function commit(update) {
     // Write before clearing the cart; a storage failure leaves checkout intact.
+    let stored
     try {
-      const next = update(readStoredOrders() ?? current.current)
+      stored = readStoredOrders()
+    } catch {
+      stored = null
+    }
+    const next = update(stored ?? current.current)
+    try {
       localStorage.setItem(ORDERS_KEY, JSON.stringify(next))
       current.current = next
       setAllOrders(next)
@@ -56,6 +67,41 @@ export default function OrdersProvider({ children }) {
       return [{ ...order, ownerEmail }, ...orders]
     })
     notifyOrder({ ...order, ownerEmail })
+  }
+
+  function advanceOrder(key, expectedStatus) {
+    if (user?.role !== 'admin')
+      throw new Error('Hanya admin yang dapat mengubah status pesanan.')
+    let changed
+    commit((orders) =>
+      orders.map((order) => {
+        if (orderKey(order) !== key) return order
+        const currentStatus = fulfillmentOf(order)
+        // Ignore a repeated click or stale panel; never skip a kitchen stage.
+        if (currentStatus !== expectedStatus || !nextFulfillment[currentStatus])
+          return order
+        const fulfillmentStatus = nextFulfillment[currentStatus].status
+        const timestamp = new Date().toISOString()
+        changed = {
+          ...order,
+          fulfillmentStatus,
+          updatedAt: timestamp,
+          status: ['shipping', 'completed'].includes(fulfillmentStatus)
+            ? fulfillmentStatus
+            : 'processing',
+          // Manual kitchen updates do not imply payment verification or live GPS.
+          ...(fulfillmentStatus === 'shipping' && {
+            trackingTimes: order.trackingTimes || [],
+          }),
+          ...(fulfillmentStatus === 'completed' && {
+            deliveredAt: timestamp,
+            deliveryNote: 'Pesanan ditandai selesai diterima oleh admin.',
+          }),
+        }
+        return changed
+      }),
+    )
+    if (changed) notifyOrder(changed)
   }
 
   function updateCourierNote(id, note) {
@@ -82,7 +128,20 @@ export default function OrdersProvider({ children }) {
     .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp))
 
   return (
-    <OrdersContext.Provider value={{ orders, addOrder, updateCourierNote }}>
+    <OrdersContext.Provider
+      value={{
+        orders,
+        addOrder,
+        updateCourierNote,
+        advanceOrder,
+        adminOrders:
+          user?.role === 'admin'
+            ? [...allOrders].sort(
+                (a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp),
+              )
+            : [],
+      }}
+    >
       {children}
     </OrdersContext.Provider>
   )

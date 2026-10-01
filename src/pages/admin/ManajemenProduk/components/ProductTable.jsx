@@ -35,7 +35,7 @@ export default function ProductTable({
   }, [])
   return (
     <div className="overflow-x-auto rounded-t-2xl bg-white">
-      <table className="w-full min-w-[840px] text-left text-xs">
+      <table className="w-full min-w-[680px] text-left text-xs">
         <thead className="bg-peach text-[10px] uppercase tracking-wide text-chocolate/80">
           <tr>
             <th className="w-12 px-5 py-5">
@@ -52,7 +52,6 @@ export default function ProductTable({
               'FOTO & NAMA PRODUK',
               'HARGA SATUAN',
               'STOK SIAP JUAL',
-              'ADONAN DINGIN (CHILLED)',
               'AKSI',
             ].map((heading) => (
               <th key={heading} className="px-3 py-5 font-semibold">
@@ -132,12 +131,6 @@ export default function ProductTable({
                     value={product.stokDisplayEtalase}
                     className={`mt-1.5 block h-1.5 w-full overflow-hidden rounded-full bg-peach [&::-webkit-progress-bar]:bg-peach [&::-webkit-progress-value]:rounded-full ${color}`}
                   />
-                </td>
-                <td className="min-w-40 px-3 py-5">
-                  <p>{product.adonanDinginChiller} pcs adonan</p>
-                  <p className="mt-1 max-w-44 text-[10px] leading-4 text-muted">
-                    {product.adonanDinginLokasi || 'Lokasi belum diatur'}
-                  </p>
                 </td>
                 <td className="px-3 py-5">
                   <div className="flex items-center gap-2">
