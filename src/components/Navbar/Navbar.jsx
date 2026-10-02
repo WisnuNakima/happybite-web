@@ -6,6 +6,7 @@ import Icon from '@/components/Icon'
 import ProfileDropdown from './ProfileDropdown'
 import NotificationButton from './NotificationButton'
 import { useAuth } from '@/context/authContext'
+import AuthStatus from '@/components/AuthStatus'
 
 const guestLinks = [
   ['Beranda', '/'],
@@ -23,7 +24,7 @@ const memberLinks = [
 ]
 
 export default function Navbar({ onAccount, onSearch, cartCount = 0 }) {
-  const { isLoggedIn } = useAuth()
+  const { isLoggedIn, loading, authError } = useAuth()
   const links = isLoggedIn ? memberLinks : guestLinks
   const [open, setOpen] = useState(false)
   const header = useRef(null)
@@ -46,6 +47,15 @@ export default function Navbar({ onAccount, onSearch, cartCount = 0 }) {
     }
   }, [])
 
+  if (loading || authError)
+    return (
+      <header className="sticky top-0 z-40 border-b border-primary/10 bg-canvas/95 backdrop-blur-lg">
+        <div className="mx-auto flex max-w-[1320px] items-center justify-between px-5 py-4 lg:px-8">
+          <Brand />
+          <AuthStatus />
+        </div>
+      </header>
+    )
   return (
     <header
       ref={header}

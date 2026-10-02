@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/authContext'
+import { loginErrorMessage } from '@/lib/authErrors'
 
 export default function AdminLoginForm() {
   const { loginAdmin } = useAuth()
@@ -8,14 +9,21 @@ export default function AdminLoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [submitting, setSubmitting] = useState(false)
 
-  function submit(event) {
+  async function submit(event) {
     event.preventDefault()
-    if (!loginAdmin({ email, password })) {
-      setError('Email atau kata sandi admin salah.')
-      return
+    if (submitting) return
+    setError('')
+    setSubmitting(true)
+    try {
+      const user = await loginAdmin({ email, password })
+      navigate(user.role === 'admin' ? '/admin' : '/', { replace: true })
+    } catch (error) {
+      setError(loginErrorMessage(error))
+    } finally {
+      setSubmitting(false)
     }
-    navigate('/admin', { replace: true })
   }
 
   return (
@@ -63,9 +71,11 @@ export default function AdminLoginForm() {
       )}
       <button
         type="submit"
+        disabled={submitting}
+        aria-busy={submitting}
         className="rounded-xl bg-terracotta px-4 py-2 font-semibold text-white"
       >
-        Masuk Admin
+        {submitting ? 'Memproses...' : 'Masuk Admin'}
       </button>
     </form>
   )

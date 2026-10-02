@@ -15,6 +15,7 @@ import KelolaPesanan from '@/pages/admin/KelolaPesanan'
 import LaporanPenjualan from '@/pages/admin/LaporanPenjualan'
 import AdminRoute from '@/pages/admin/components/AdminRoute'
 import AdminLayout from '@/pages/admin/components/AdminLayout'
+import ProtectedRoute from '@/components/ProtectedRoute'
 
 export default function AppRoutes({
   cartCount,
@@ -44,70 +45,74 @@ export default function AppRoutes({
       </Route>
       <Route path="/" element={<Home cartCount={cartCount} />} />
       <Route path="/login" element={<Login />} />
-      <Route
-        path="/profil"
-        element={<AccountPlaceholder kind="profile" cartCount={cartCount} />}
-      />
-      <Route
-        path="/riwayat-pesanan"
-        element={<OrderHistory cartCount={cartCount} />}
-      />
-      <Route
-        path="/katalog"
-        element={<CatalogMenu cartCount={cartCount} onAddToCart={addToCart} />}
-      />
-      <Route
-        path="/katalog/:productId"
-        element={
-          <ProductDetail
-            cartCount={cartCount}
-            onAddToCart={addToCart}
-            onBuyNow={buyNow}
-          />
-        }
-      />
-      <Route
-        path="/checkout"
-        element={
-          <Checkout
-            cartItems={cartItems}
-            cartCount={cartCount}
-            gift={gift}
-            form={checkout}
-            setForm={setCheckout}
-            onContinue={startPayment}
-          />
-        }
-      />
-      <Route
-        path="/pembayaran"
-        element={
-          <Payment
-            key={order?.id}
-            cartCount={cartCount}
-            cartItems={cartItems}
-            checkout={checkout}
-            order={order?.status === 'placed' ? order : currentOrder}
-            onConfirm={confirmPayment}
-          />
-        }
-      />
-      <Route
-        path="/pesanan-berhasil"
-        element={<Navigate to="/riwayat-pesanan" replace />}
-      />
-      <Route
-        path="/keranjang"
-        element={
-          <Cart
-            cartItems={cartItems}
-            cartCount={cartCount}
-            dispatchCart={dispatchCart}
-            gift={gift}
-            onGiftChange={setGift}
-          />
-        }
-      />
+      <Route element={<ProtectedRoute />}>
+        <Route
+          path="/profil"
+          element={<AccountPlaceholder kind="profile" cartCount={cartCount} />}
+        />
+        <Route
+          path="/riwayat-pesanan"
+          element={<OrderHistory cartCount={cartCount} />}
+        />
+        <Route
+          path="/katalog"
+          element={
+            <CatalogMenu cartCount={cartCount} onAddToCart={addToCart} />
+          }
+        />
+        <Route
+          path="/katalog/:productId"
+          element={
+            <ProductDetail
+              cartCount={cartCount}
+              onAddToCart={addToCart}
+              onBuyNow={buyNow}
+            />
+          }
+        />
+        <Route
+          path="/checkout"
+          element={
+            <Checkout
+              cartItems={cartItems}
+              cartCount={cartCount}
+              gift={gift}
+              form={checkout}
+              setForm={setCheckout}
+              onContinue={startPayment}
+            />
+          }
+        />
+        <Route
+          path="/pembayaran"
+          element={
+            <Payment
+              key={order?.id}
+              cartCount={cartCount}
+              cartItems={cartItems}
+              checkout={checkout}
+              order={order?.status === 'placed' ? order : currentOrder}
+              onConfirm={confirmPayment}
+            />
+          }
+        />
+        <Route
+          path="/pesanan-berhasil"
+          element={<Navigate to="/riwayat-pesanan" replace />}
+        />
+        <Route
+          path="/keranjang"
+          element={
+            <Cart
+              cartItems={cartItems}
+              cartCount={cartCount}
+              dispatchCart={dispatchCart}
+              gift={gift}
+              onGiftChange={setGift}
+            />
+          }
+        />
+      </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

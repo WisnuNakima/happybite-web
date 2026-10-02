@@ -13,11 +13,11 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       <AuthProvider>
         <NotificationsProvider>
-          <OrdersProvider>
-            <ProductsProvider>
+          <ProductsProvider>
+            <OrdersProvider>
               <App />
-            </ProductsProvider>
-          </OrdersProvider>
+            </OrdersProvider>
+          </ProductsProvider>
         </NotificationsProvider>
       </AuthProvider>
     </BrowserRouter>

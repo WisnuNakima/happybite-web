@@ -1,20 +1,24 @@
 import { useState } from 'react'
 import Icon from '@/components/Icon'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/authContext'
+import { loginErrorMessage } from '@/lib/authErrors'
 
 export default function LoginForm({ onRegister }) {
   const { login } = useAuth()
   const navigate = useNavigate()
-  const { state } = useLocation()
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
   const [errors, setErrors] = useState({})
 
-  function submit(event) {
+  async function submit(event) {
     event.preventDefault()
+    if (submitting) return
+    setSubmitError('')
     const nextErrors = {}
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
       nextErrors.email = 'Masukkan alamat email yang valid.'
@@ -27,10 +31,15 @@ export default function LoginForm({ onRegister }) {
         ?.focus()
       return
     }
-    login({ name: 'Amanda Putri', email })
-    navigate(state?.returnTo === '/pembayaran' ? '/pembayaran' : '/', {
-      replace: true,
-    })
+    setSubmitting(true)
+    try {
+      const user = await login({ email, password })
+      navigate(user.role === 'admin' ? '/admin' : '/', { replace: true })
+    } catch (error) {
+      setSubmitError(loginErrorMessage(error))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   const fieldClass =
@@ -164,11 +173,19 @@ export default function LoginForm({ onRegister }) {
           </span>
         </div>
 
+        {submitError && (
+          <p role="alert" className="mt-4 text-xs text-red-700">
+            {submitError}
+          </p>
+        )}
         <button
           type="submit"
+          disabled={submitting}
+          aria-busy={submitting}
           className="mt-7 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-terracotta px-4 py-3 text-sm font-bold text-white shadow-warm transition-colors hover:bg-baked"
         >
-          Masuk ke Akun HappyBite <Icon name="arrow" className="h-4 w-4" />
+          {submitting ? 'Memproses...' : 'Masuk ke Akun HappyBite'}{' '}
+          <Icon name="arrow" className="h-4 w-4" />
         </button>
       </form>
 

@@ -1,13 +1,16 @@
 import { useState } from 'react'
 import Icon from '@/components/Icon'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/context/authContext'
+import { registerErrorMessage } from '@/lib/authErrors'
 
 export default function RegisterForm({ onLogin }) {
   const [fullName, setFullName] = useState('')
-  const { login } = useAuth()
+  const { register } = useAuth()
   const navigate = useNavigate()
-  const { state } = useLocation()
+  const [submitting, setSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState('')
+  const [message, setMessage] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -18,8 +21,11 @@ export default function RegisterForm({ onLogin }) {
     setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
-  function submit(event) {
+  async function submit(event) {
     event.preventDefault()
+    if (submitting) return
+    setSubmitError('')
+    setMessage('')
     const nextErrors = {}
     if (!fullName.trim()) nextErrors.fullName = 'Nama lengkap wajib diisi.'
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
@@ -34,10 +40,19 @@ export default function RegisterForm({ onLogin }) {
       document.getElementById(`register-${firstError}`)?.focus()
       return
     }
-    login({ name: fullName, email })
-    navigate(state?.returnTo === '/pembayaran' ? '/pembayaran' : '/', {
-      replace: true,
-    })
+    setSubmitting(true)
+    try {
+      const { session } = await register({ name: fullName, email, password })
+      if (session) navigate('/', { replace: true })
+      else
+        setMessage(
+          'Pendaftaran berhasil. Silakan cek email kamu untuk konfirmasi, lalu masuk.',
+        )
+    } catch (error) {
+      setSubmitError(registerErrorMessage(error))
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   // Keep registration fields visually consistent with LoginForm.
@@ -218,11 +233,24 @@ export default function RegisterForm({ onLogin }) {
           </span>
         </div>
 
+        {submitError && (
+          <p role="alert" className="mt-4 text-xs text-red-700">
+            {submitError}
+          </p>
+        )}
+        {message && (
+          <p role="status" className="mt-4 text-xs text-muted">
+            {message}
+          </p>
+        )}
         <button
           type="submit"
+          disabled={submitting}
+          aria-busy={submitting}
           className="mt-7 flex min-h-[52px] w-full items-center justify-center gap-2 rounded-full bg-terracotta px-4 py-3 text-sm font-bold text-white shadow-warm transition-colors hover:bg-baked"
         >
-          Buat Akun Baru <Icon name="arrow" className="h-4 w-4" />
+          {submitting ? 'Memproses...' : 'Buat Akun Baru'}{' '}
+          <Icon name="arrow" className="h-4 w-4" />
         </button>
       </form>
 

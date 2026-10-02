@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from './authContext'
+import { useProducts } from './productsContext'
 import { OrdersContext } from './ordersContext'
 import { useNotifications } from './notificationsContext'
 import { ORDERS_KEY, createSampleOrders, readStoredOrders } from '@/data/orders'
@@ -18,6 +19,7 @@ function initialOrders() {
 }
 
 export default function OrdersProvider({ children }) {
+  const { withOrderInventory } = useProducts()
   const { notifyOrder } = useNotifications()
   const { user } = useAuth()
   const ownerEmail = user?.email.trim().toLowerCase()
@@ -56,17 +58,20 @@ export default function OrdersProvider({ children }) {
 
   function addOrder(order) {
     if (!ownerEmail) throw new Error('Silakan masuk untuk menyimpan pesanan.')
-    commit((orders) => {
-      // Payment-session IDs make repeated confirmations idempotent.
-      if (
-        orders.some(
-          (item) => item.id === order.id && item.ownerEmail === ownerEmail,
-        )
+    const orders = readStoredOrders() ?? current.current
+    // An already saved confirmation must neither create another order nor
+    // deduct inventory again, including after restoring a payment session.
+    if (
+      orders.some(
+        (item) => item.id === order.id && item.ownerEmail === ownerEmail,
       )
-        return orders
-      return [{ ...order, ownerEmail }, ...orders]
+    )
+      return
+    const placed = { ...order, ownerEmail }
+    withOrderInventory(placed, () => {
+      commit((latest) => [placed, ...latest])
     })
-    notifyOrder({ ...order, ownerEmail })
+    notifyOrder(placed)
   }
 
   function advanceOrder(key, expectedStatus) {

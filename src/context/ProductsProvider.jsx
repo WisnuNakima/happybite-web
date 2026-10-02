@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useAuth } from './authContext'
 import { ProductsContext } from './productsContext'
+import { reserveOrderInventory } from '@/data/orderInventory'
 import {
   PRODUCTS_KEY,
   parseProducts,
@@ -70,9 +71,47 @@ export default function ProductsProvider({ children }) {
   function deleteProduct(id) {
     commit(current.current.filter((p) => p.id !== id))
   }
+
+  function withOrderInventory(order, saveOrder) {
+    if (!user || order.ownerEmail !== user.email.trim().toLowerCase())
+      throw new Error('Silakan masuk untuk menyimpan pesanan.')
+    // Read the latest persisted inventory, including edits from another tab.
+    const previous = readProducts()
+    const next = reserveOrderInventory(previous, order)
+    try {
+      localStorage.setItem(PRODUCTS_KEY, JSON.stringify(next))
+    } catch {
+      throw new Error(
+        'Stok belum tersimpan. Izinkan penyimpanan browser atau kosongkan ruang, lalu coba lagi. Keranjang tetap tersimpan.',
+      )
+    }
+    try {
+      saveOrder()
+    } catch (error) {
+      // Failed order persistence must not consume stock. If storage also blocks
+      // rollback, keep the reservation ID so a retry cannot deduct it twice.
+      try {
+        localStorage.setItem(PRODUCTS_KEY, JSON.stringify(previous))
+        current.current = previous
+        setProducts(previous)
+      } catch {
+        current.current = next
+        setProducts(next)
+      }
+      throw error
+    }
+    current.current = next
+    setProducts(next)
+  }
   return (
     <ProductsContext.Provider
-      value={{ products, saveProduct, duplicateProduct, deleteProduct }}
+      value={{
+        products,
+        saveProduct,
+        duplicateProduct,
+        deleteProduct,
+        withOrderInventory,
+      }}
     >
       {children}
     </ProductsContext.Provider>

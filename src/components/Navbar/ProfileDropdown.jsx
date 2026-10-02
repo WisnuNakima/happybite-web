@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useAuth } from '@/context/authContext'
 import Icon from '@/components/Icon'
 
 export default function ProfileDropdown() {
   const { user, logout } = useAuth()
-  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const [error, setError] = useState('')
   const container = useRef(null)
   const trigger = useRef(null)
   useEffect(() => {
@@ -72,15 +73,28 @@ export default function ProfileDropdown() {
           <div className="my-1 border-t border-primary/20" />
           <button
             type="button"
-            onClick={() => {
-              logout()
-              setOpen(false)
-              navigate('/')
+            disabled={leaving}
+            onClick={async () => {
+              setLeaving(true)
+              setError('')
+              try {
+                await logout()
+                setOpen(false)
+              } catch {
+                setError('Gagal keluar. Silakan coba lagi.')
+                setLeaving(false)
+                setOpen(true)
+              }
             }}
             className="w-full rounded-xl px-3 py-3 text-left text-sm font-semibold text-red-700 hover:bg-red-50"
           >
-            Keluar
+            {leaving ? 'Memproses...' : 'Keluar'}
           </button>
+          {error && (
+            <p role="alert" className="px-3 py-2 text-xs text-red-700">
+              {error}
+            </p>
+          )}
         </div>
       )}
     </div>

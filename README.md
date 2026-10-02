@@ -97,15 +97,15 @@ The Home, Login, and Catalog pages run without an authentication or commerce bac
 - Detail quantity starts at one and updates the subtotal and shared cart by the selected quantity. Quantity and bundle choices are controlled locally and reset on product navigation. Buy Now puts that product/variant and chosen quantity into the shared cart, selects it alone, and opens checkout; other cart lines remain available but unselected. The WhatsApp button uses the existing contact-availability dialog until a verified contact URL is configured.
 - Login validates email format and a nonempty password, supports password visibility and a checked-by-default remember-me option, and preserves input values when switching tabs.
 - Registration validates a nonblank full name, a valid email, and a password of at least 8 characters. Its input values, password visibility, checkbox, and feedback are independent of Login and persist when switching tabs. Both forms use email and password only; registration does not include social login, password recovery, or discount offers.
-- Valid Login and Register submissions call `useAuth().login()` and normally navigate home. Guests reaching payment are asked to sign in and return to `/pembayaran` with their checkout intact. Login uses the placeholder name Amanda Putri plus the entered email; Register uses the entered name and email. `localStorage['happybite-auth-v1']` stores only `{ isLoggedIn, user: { name, email, role } }`; passwords are never logged, persisted, or sent. Existing accounts without a role default to customer, and customer Login/Register always assign the customer role. The school-project auth flag persists regardless of the existing remember-me checkbox and does not verify credentials against a server.
-- Guest navigation is unchanged. Signed-in navigation uses Beranda, Katalog Menu, Riwayat Pesanan, Tentang Kami, and Kontak & FAQ, followed by the unchanged cart and a profile dropdown. The dropdown closes on outside click, Escape, or focus leaving it. Profile opens its placeholder, while order history opens the full local demo page. Logout removes only the auth entry and returns home, leaving the shared cart unchanged. Both account pages redirect guests to `/login`. This is UI state, not server-enforced authentication.
+- AuthProvider uses the existing `src/lib/supabaseClient.js` client. Login calls `signInWithPassword`; registration calls `signUp` with `options.data.nama_lengkap`, and the database trigger creates the profile. Supabase manages session persistence; the legacy `happybite-auth-v1` key is removed. After authentication, `profiles.nama_lengkap` and `profiles.role` populate the user (`pelanggan` or `admin`). A registration without a session prompts email confirmation. Successful customer login/registration returns home; admin login returns to `/admin`.
+- The Navbar waits for session/profile restoration before rendering guest or member navigation. Logout awaits Supabase signOut, then returns home. Katalog, product details, cart, checkout, payment, profile and order history use ProtectedRoute; guests redirect to `/login`. Profile failures show a retry message instead of granting access or guessing a role. Cart, products, orders and notifications remain local browser data for now.
 - Order history reads shared orders, newest first, scoped to the signed-in account's normalized email. Orders survive refresh and browser restarts on the same browser/origin. Two clearly labeled Demo examples (shipping and completed) remain for illustration; only the shipping example has a tracking bar. Three cards appear initially; Load More reveals the rest. Status counts, invoice/product search, and date filters use current state and the actual current date. Edited courier notes persist too. Recipient and address details are available in Detail Pesanan. The admin chat button opens the existing contact-availability dialog until a verified WhatsApp URL is configured. There is no backend synchronization, courier integration, or payment verification.
 - The Login footer opens help or availability dialogs for privacy and terms. The SSL badge and copyright copy follow the approved mockup; transport security must be configured on the deployment host.
 - Only signed-in navigation shows the notification bell, next to the profile button. Guest catalog links have a lock icon on desktop and mobile. Successfully placing an order creates one unread status notification, deduplicated by account, order ID, and status. Existing checkout orders are recovered on startup; sample orders do not generate alerts. Notification links mark the item read and open order history. Mark All Read applies to the current account. Only order-status notifications are supported; retired categories are removed when reading older browser storage and excluded from badges and counts.
 - The notification modal uses a dimmed backdrop, trapped keyboard focus, Escape/outside/X dismissal, restored trigger focus, and a separately scrollable list. Relative timestamps refresh every minute while open. Notifications are local school-project state; there are no backend courier updates or push notifications.
 - Individual review stars, testimonials, certifications, and contact details are static content.
 - Footer contact and social buttons currently show an availability message. Replace them with verified contact URLs before launch.
-- Catalog prices are visible mock data; authentication, ordering, payments, and checkout still need backend integration.
+- Catalog products and prices remain local fixture data; ordering and payment verification still need backend integration.
 
 ## Admin routing skeleton
 
@@ -124,11 +124,11 @@ src/pages/admin/
   LaporanPenjualan/    LaporanPenjualan.jsx, index.js, components/, utils/
 ```
 
-- `/admin/login` is public and outside AdminLayout. The minimal form uses `loginAdmin()` with the single temporary `MOCK_ADMIN_CREDENTIALS` constant in `src/data/adminAuth.js`: `admin@happybite.com` / `admin123`.
-- `/admin`, `/admin/produk`, `/admin/pesanan`, and `/admin/laporan` nest under AdminRoute and AdminLayout. Missing authentication or any role other than admin redirects to `/admin/login`. There is no customer Navbar or Footer in the admin layout.
-- Sidebar NavLinks highlight the active page. Pengaturan Dapur is an inactive placeholder link; Keluar clears auth and returns to `/admin/login`. Empty components folders use `.gitkeep` so they survive Git checkout.
-- Role persists with the existing auth state. Even the mock admin email/password entered through the customer login or registration forms produces a customer role. This is client-side demo access control only; the marked mock credentials and role checks must be replaced with backend authentication and authorization before production.
-- Build/lint and browser checks cover guest/customer redirects, invalid and valid admin credentials, all four routes inside the same layout, active links, refresh persistence, logout, legacy accounts, and customer Login/Register role isolation.
+- `/admin/login` is public and outside AdminLayout. Its form uses the same Supabase password login as the customer form. No mock credentials or hardcoded admin identity remain.
+- `/admin`, `/admin/produk`, `/admin/pesanan`, and `/admin/laporan` nest under AdminRoute and AdminLayout. Guards wait for the session and profile: guests redirect to `/admin/login`, authenticated non-admins to `/`.
+- Sidebar NavLinks highlight the active page. Pengaturan Dapur remains a placeholder; Keluar awaits Supabase signOut and returns home.
+- Admin access comes only from `profiles.role = admin`; signup never sends a role or inserts a profile. Admin jobTitle remains `Head Baker & Owner`. Configure database RLS to allow users to read their own profile without allowing them to promote their role.
+- Supabase integration checks use intercepted Auth/profile HTTP responses, covering session restoration, redirects, errors, signup confirmation, admin/customer roles and sign-out. Existing demo-auth browser scripts predate this migration.
 
 ## Admin product management
 
@@ -137,7 +137,7 @@ src/pages/admin/
 - `src/data/catalogProducts.js` holds the original catalog/detail fixtures and extended `seedProducts`. Existing vegan products and the pairing-only drink retain their categories; counts are derived from the actual data.
 - `ProductsProvider` owns the shared product list, persisted as `happybite-products-v1` in localStorage and synchronized between browser tabs. Catalog, detail, cart, checkout, payment, and new order snapshots use this same list. Previously placed orders keep their snapshots.
 - The editor supports name/price validation, stock and chiller information, oven settings, description, website visibility, and local JPG/PNG/WEBP photos up to 2 MB. Photos are stored as data URLs; storage failures keep the editor open with an error and do not claim a successful save. Hiding a product removes it from the catalog, related products, and public detail lookup.
-- Mock admin profile now includes `jobTitle`. The top search searches orders/customers on `/admin/pesanan`, transactions on `/admin/laporan`, and products elsewhere.
+- The admin profile includes `jobTitle`. The top search searches orders/customers on `/admin/pesanan`, transactions on `/admin/laporan`, and products elsewhere.
 - Run `node .artifacts/admin-products-check.cjs` with Vite on `127.0.0.1:5185` and the existing local Playwright harness to check CRUD, filters, uploads, persistence, cross-tab updates, PDF export, responsive layout, and a new product through the full checkout/order flow.
 
 ## Admin order management
@@ -205,3 +205,9 @@ The folder refactor additionally verifies unchanged ASTs for all 72 existing fun
 ## Hosting
 
 React Router uses browser history. Configure the production host to serve `index.html` for app routes such as `/login`, `/katalog`, `/checkout`, and `/pembayaran`, so direct links and refreshes work. Vite's development server already supports this fallback.
+
+## Supabase Auth configuration
+
+The existing client reads `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` from `.env.local`. Never place a service-role key in frontend code. The `profiles` table and signup trigger must already exist; no frontend profile inserts are performed. Existing browser-only mock accounts are not migrated into Supabase. Use a registered, confirmed account; assign admin roles through trusted database administration.
+
+Reference: [Supabase signup](https://supabase.com/docs/reference/javascript/auth-signup) and [auth state subscription](https://supabase.com/docs/reference/javascript/auth-onauthstatechange).
